@@ -25,16 +25,18 @@ search_history = {}
 def geocode():
     city_name = request.args.get('city_name')
     if city_name in search_history:
-        app.logger.debug('hit cache, save search')
         return jsonify(result=search_history[city_name])
     location = geolocator.geocode(city_name, exactly_one=False)
-    candidates = [l.address for l in location]
-    app.logger.debug('search for ' + city_name + ', got ' + str(len(location)) + \
-            ' result')
-    app.logger.debug(candidates)
-    search_history[city_name] = candidates
-    for l in location:
-        city_cache[l.address] = [l.latitude, l.longitude]
+    if location:
+        candidates = [l.address for l in location]
+        [app.logger.debug(l.address) for l in location]
+        app.logger.debug('search for ' + city_name + ', got ' + \
+                str(len(location)) + ' result')
+        search_history[city_name] = candidates
+        for l in location:
+            city_cache[l.address] = [l.latitude, l.longitude]
+    else:
+        candidates = []
     return jsonify(result=candidates)
 
 def preprocess(paths):
@@ -48,6 +50,8 @@ def main():
         try:
             sources = request.form.getlist('from')
             dests = request.form.getlist('to')
+            if not all(sources) or not all(dests):
+                raise ValueError('必须填写所有地址')
             vehicles = request.form.getlist('vehicle')
             use_map = request.form['map']
             paths = []
@@ -56,7 +60,7 @@ def main():
             for source, dest, vehicle in zip(sources, dests, vehicles):
                 paths.append([source.split(', ')[0], dest.split(', ')[0], vehicle])
                 dist = great_circle(city_cache[source], city_cache[dest]).km
-                dists.append(dist)
+                dists.append(round(dist, 2))
                 print 'the distance between "%s" and "%s" is %.2f km' % (
                             source, dest, dist
                         )
@@ -67,7 +71,7 @@ def main():
             if use_map == 'world':
                 zoom = round(15000.0 / max(dists))
             else:
-                zoom = round(1500.0 / max(dists))
+                zoom = round(5000.0 / max(dists))
             scale = 10.0 / min(periods)
             periods = [scale * x for x in periods]
             geo_coord_map = {}
@@ -88,7 +92,7 @@ def main():
                 geo_coord_map=json.dumps(geo_coord_map),
                 city_list=json.dumps(city_list),
                 periods=periods, center=center, zoom=zoom,
-                use_map=json.dumps(use_map))
+                use_map=json.dumps(use_map), dists=dists)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8291, debug=True)

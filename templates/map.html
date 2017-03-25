@@ -22,9 +22,10 @@
         var center = {{ center }};
         var zoom = {{ zoom }};
         var use_map = {{ use_map | safe }};
+        var dists = {{ dists }};
 
         var option = build_option(paths, geo_coord_map, city_list, periods,
-            center, zoom, use_map);
+            center, zoom, use_map, dists);
         console.log(option);
         myChart.setOption(option);
     </script>

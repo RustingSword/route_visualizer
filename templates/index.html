@@ -38,12 +38,10 @@
                 $('#cities').empty();
                 data.result.forEach(function (city, i) {
                     console.log(i + ' ' + city);
-                    if (i <= 5) {
-                        $('<option />', {
-                            val: city,
-                            text: city
-                        }).appendTo($('#cities'))
-                    };
+                    $('<option />', {
+                        val: city,
+                        text: city
+                    }).appendTo($('#cities'));
                 });
             });
         }
@@ -55,7 +53,7 @@
     {% for message in get_flashed_messages() %}
     <div class="alert alert-danger alert-dismissable">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        {{ message }}
+        {{ message.decode('utf-8') }}
     </div>
     {% endfor %}
     <p>使用说明：输入地名之后等大概2秒，会出现一个下拉列表，必须从里面选择，不能输完就跑，否则会出错。如果发现等了2秒之后啥都没有，可以尝试把输入的东西删掉，点一下输入框右边的箭头（如果有的话），可能有惊喜。</p>
@@ -83,7 +81,7 @@
             </select>
         </div>
         <div>
-            <button type="submit" class="btn btn-default">make the map</button>
+            <button type="submit" class="btn btn-default">show me the map</button>
         </div>
     </form>
 </body>
