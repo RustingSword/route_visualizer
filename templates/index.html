@@ -7,46 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css')}}">
     <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
     <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-    <script src={{ url_for('static', filename='form.js') }}></script>
     <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript">
-    $(document).on('change input', function () {
-        // $('input[name=to]').focus();
         var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-        //setup before functions
-        var typingTimer = null;         //timer identifier
-        var doneTypingInterval = 1000;  //time in ms, 1 second for example
-        var $input = $('input:focus');
-
-        // updated events
-        $input.keyup(function (e) {
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(doneTyping, doneTypingInterval);
-        });
-
-        $input.on('keydown', function () {
-            clearTimeout(typingTimer);
-        })
-
-        //user is "finished typing," do something
-        function doneTyping () {
-            console.log('search: ' + $(':focus').val());
-            $.getJSON($SCRIPT_ROOT + '/geocode', {
-                city_name: $(':focus').val()
-            }, function(data) {
-                console.log('result: ' + data.result);
-                $('#cities').empty();
-                data.result.forEach(function (city, i) {
-                    console.log(i + ' ' + city);
-                    $('<option />', {
-                        val: city,
-                        text: city
-                    }).appendTo($('#cities'));
-                });
-            });
-        }
-    });
     </script>
+    <script src={{ url_for('static', filename='form.js') }}></script>
 </head>
 <body>
     <h1>交通路线可视化工具</h1>
@@ -56,18 +21,18 @@
         {{ message.decode('utf-8') }}
     </div>
     {% endfor %}
-    <p>使用说明：输入地名之后等大概2秒，会出现一个下拉列表，必须从里面选择，不能输完就跑，否则会出错。如果发现等了2秒之后啥都没有，可以尝试把输入的东西删掉，点一下输入框右边的箭头（如果有的话），可能有惊喜。</p>
+    <p><b>使用说明</b>：输入地名之后等大概2秒，会出现一个下拉列表，必须从里面选择，不能输完就跑，否则会出错。如果发现等了2秒之后啥都没有，或者没有看到你想要的地名，可以尝试把输入的东西删掉，点一下输入框右边的箭头（如果有的话），可能有惊喜。</p>
     <form id="input" method="POST">
         <div class="container1">
             <button class="add_form_field btn btn-info">增加路线</button>
             <div class="form-group">
                 <datalist id="cities"></datalist>
                 <label>出发城市: </label><input type="text" name="from"
-                list="cities">
+                list="cities" autocomplete="off">
                 <label>到达城市: </label><input type="text" name="to"
-                list="cities">
+                list="cities" autocomplete="off">
                 <label>交通工具: </label>
-                <select type="text" name="vehicle">
+                <select name="vehicle">
                     <option value="plane">飞机</option>
                     <option value="car">汽车</option>
                 </select>
@@ -75,13 +40,13 @@
         </div>
         <div class="form-group">
             <label>选择地图: </label>
-            <select type="text" name="map">
+            <select name="map">
                 <option value="china">中国地图</option>
                 <option value="world">世界地图</option>
             </select>
         </div>
         <div>
-            <button type="submit" class="btn btn-default">show me the map</button>
+            <button type="submit" class="btn btn-primary">show me the map</button>
         </div>
     </form>
 </body>

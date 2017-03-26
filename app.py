@@ -6,6 +6,7 @@ import requests
 from geopy.geocoders import Nominatim
 from geopy.distance import great_circle
 import json
+import logging
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'seckey'
@@ -24,14 +25,14 @@ search_history = {}
 @app.route('/geocode')
 def geocode():
     city_name = request.args.get('city_name')
+    if not city_name:
+        return jsonify(result=[])
     if city_name in search_history:
         return jsonify(result=search_history[city_name])
     location = geolocator.geocode(city_name, exactly_one=False)
-    if location:
+    if location is not None:
         candidates = [l.address for l in location]
         [app.logger.debug(l.address) for l in location]
-        app.logger.debug('search for ' + city_name + ', got ' + \
-                str(len(location)) + ' result')
         search_history[city_name] = candidates
         for l in location:
             city_cache[l.address] = [l.latitude, l.longitude]
@@ -61,12 +62,13 @@ def main():
                 paths.append([source.split(', ')[0], dest.split(', ')[0], vehicle])
                 dist = great_circle(city_cache[source], city_cache[dest]).km
                 dists.append(round(dist, 2))
-                print 'the distance between "%s" and "%s" is %.2f km' % (
+                app.logger.debug(
+                        'the distance between "%s" and "%s" is %.2f km' % (
                             source, dest, dist
-                        )
-                print 'it approximately takes %.2f hours by %s ' % (
+                        ))
+                app.logger.debug('it approximately takes %.2f hours by %s ' % (
                         dist / VEHICLE_SPEED[vehicle], vehicle
-                        )
+                        ))
                 periods.append(dist / VEHICLE_SPEED[vehicle])
             if use_map == 'world':
                 zoom = round(15000.0 / max(dists))
@@ -93,6 +95,13 @@ def main():
                 city_list=json.dumps(city_list),
                 periods=periods, center=center, zoom=zoom,
                 use_map=json.dumps(use_map), dists=dists)
+
+@app.before_first_request
+def setup_logging():
+    if not app.debug:
+        # In production mode, add log handler to sys.stderr.
+        app.logger.addHandler(logging.StreamHandler())
+        app.logger.setLevel(logging.DEBUG)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8291, debug=True)
