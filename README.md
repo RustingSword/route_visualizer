@@ -4,9 +4,8 @@
 
 主要用到OpenStreetMap的[Nominatim](http://wiki.openstreetmap.org/wiki/Nominatim)（通过[geopy](https://github.com/geopy/geopy)）和百度的[Echarts](http://echarts.baidu.com/demo.html#geo-lines)。
 
-今年清明的规划：
-![input](input.jpg)
-![result](result.jpg)
+![input](input.png)
+![result](result.png)
 
 # 用法
 
