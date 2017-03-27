@@ -58,7 +58,10 @@ def main():
             need_hours = []
             for source, dest, vehicle in zip(sources, dests, vehicles):
                 paths.append([source.split(', ')[0], dest.split(', ')[0], vehicle])
-                dist = great_circle(city_cache[source], city_cache[dest]).km
+                try:
+                    dist = great_circle(city_cache[source], city_cache[dest]).km
+                except KeyError as e:
+                    raise ValueError('没有这个地址: %s' % e.message.encode('utf-8'))
                 dists.append(round(dist, 2))
                 need_hour = round(dist/VEHICLE_SPEED[vehicle], 2)
                 app.logger.debug(
@@ -77,10 +80,15 @@ def main():
             scale = 10.0 / min(periods)
             periods = [scale * x for x in periods]
             geo_coord_map = {}
-            for source in sources:
-                geo_coord_map[source.split(', ')[0]] = list(reversed(city_cache[source]))
-            for dest in dests:
-                geo_coord_map[dest.split(', ')[0]] = list(reversed(city_cache[dest]))
+            try:
+                for source in sources:
+                    geo_coord_map[source.split(', ')[0]] = \
+                            list(reversed(city_cache[source]))
+                for dest in dests:
+                    geo_coord_map[dest.split(', ')[0]] = \
+                            list(reversed(city_cache[dest]))
+            except KeyError as e:
+                raise ValueError('没有这个地址: %s' % e.message.encode('utf-8'))
             city_list = geo_coord_map.keys()
             laltitudes = [coords[0] for coords in geo_coord_map.values()]
             longitudes = [coords[1] for coords in geo_coord_map.values()]
