@@ -58,6 +58,8 @@ $(document).on('input', function () {
         $.getJSON($SCRIPT_ROOT + '/geocode', {
             city_name: $(':focus').val()
         }, function(data) {
+            $(':focus').attr('placeholder', $(':focus').val());
+            $(':focus').val(' ');
             $('#cities').empty();
             data.result.forEach(function (city, i) {
                 console.log(i + ' ' + city);
@@ -66,21 +68,12 @@ $(document).on('input', function () {
                     text: city
                 }).appendTo($('#cities'));
             });
+            $(':focus').val('');
         });
-        $(':focus').click();
     }
 });
 
 $(document).ready(function() {
-    $('input').on('click', function() {
-        // XXX FIXME
-        // Hack to display all datalist options
-        // Only tested in Chrome
-        var t = $(this).val();
-        $(this).val(' ');
-        $(this).attr('placeholder', t);
-    });
-
     $('input').on('mouseleave', function() {
       if (!/\S/.test($(this).val())) {
           $(this).val($(this).attr('placeholder'));
