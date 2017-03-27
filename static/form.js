@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var max_fields      = 10;
+    var max_fields      = 20;
     var wrapper         = $(".container1");
     var add_button      = $(".add_form_field");
     var x = 1;
@@ -31,10 +31,11 @@ $(document).ready(function() {
     })
 });
 
-$(document).on('change input', function () {
+var typingTimer = null;         //timer identifier
+var doneTypingInterval = 1000;  //time in ms, 1 second for example
+$(document).on('input', function () {
+    clearTimeout(typingTimer);
     //setup before functions
-    var typingTimer = null;         //timer identifier
-    var doneTypingInterval = 1000;  //time in ms, 1 second for example
     var $input = $('input:focus');
 
     // updated events
@@ -49,6 +50,10 @@ $(document).on('change input', function () {
 
     //user is "finished typing," do something
     function doneTyping () {
+        if ($(':focus').val() == '') {
+            console.log('keep content');
+            return;
+        }
         console.log('search: ' + $(':focus').val());
         $.getJSON($SCRIPT_ROOT + '/geocode', {
             city_name: $(':focus').val()

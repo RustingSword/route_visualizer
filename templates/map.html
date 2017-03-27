@@ -23,9 +23,10 @@
         var zoom = {{ zoom }};
         var use_map = {{ use_map | safe }};
         var dists = {{ dists }};
+        var need_hours = {{ need_hours }};
 
         var option = build_option(paths, geo_coord_map, city_list, periods,
-            center, zoom, use_map, dists);
+            center, zoom, use_map, dists, need_hours);
         console.log(option);
         myChart.setOption(option);
     </script>

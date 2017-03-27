@@ -20,7 +20,7 @@ var sizes = {
 var color = ['#a6c84c', '#ffa022', '#46bee9', '#f4e925'];
 
 var build_option = function (path_data, geoCoordMap, city_list, periods, center,
-    zoom, use_map, dists) {
+    zoom, use_map, dists, need_hours) {
     var series = [];
     path_data.forEach(function (item, i) {
         series.push({
@@ -72,7 +72,8 @@ var build_option = function (path_data, geoCoordMap, city_list, periods, center,
                 }
             },
             data: [{
-                name: item[0] + ' → ' + item[1] + ' 约' + dists[i] + '公里',
+                name: item[0] + ' → ' + item[1] + ' | ' + dists[i] + ' 公里' +
+                    ' | ' + need_hours[i] + ' 小时',
                 fromName: item[0],
                 toName: item[1],
                 coords: [

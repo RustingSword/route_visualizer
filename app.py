@@ -40,9 +40,6 @@ def geocode():
         candidates = []
     return jsonify(result=candidates)
 
-def preprocess(paths):
-    pass
-
 @app.route('/', methods=['GET', 'POST'])
 def main():
     if request.method == 'GET':
@@ -58,18 +55,21 @@ def main():
             paths = []
             periods = []
             dists = []
+            need_hours = []
             for source, dest, vehicle in zip(sources, dests, vehicles):
                 paths.append([source.split(', ')[0], dest.split(', ')[0], vehicle])
                 dist = great_circle(city_cache[source], city_cache[dest]).km
                 dists.append(round(dist, 2))
+                need_hour = round(dist/VEHICLE_SPEED[vehicle], 2)
                 app.logger.debug(
                         'the distance between "%s" and "%s" is %.2f km' % (
                             source, dest, dist
                         ))
                 app.logger.debug('it approximately takes %.2f hours by %s ' % (
-                        dist / VEHICLE_SPEED[vehicle], vehicle
+                        need_hour, vehicle
                         ))
-                periods.append(dist / VEHICLE_SPEED[vehicle])
+                periods.append(need_hour)
+                need_hours.append(need_hour)
             if use_map == 'world':
                 zoom = round(15000.0 / max(dists))
             else:
@@ -94,7 +94,7 @@ def main():
                 geo_coord_map=json.dumps(geo_coord_map),
                 city_list=json.dumps(city_list),
                 periods=periods, center=center, zoom=zoom,
-                use_map=json.dumps(use_map), dists=dists)
+                use_map=json.dumps(use_map), dists=dists, need_hours=need_hours)
 
 @app.before_first_request
 def setup_logging():
