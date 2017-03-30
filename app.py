@@ -13,7 +13,8 @@ app.config['SECRET_KEY'] = 'seckey'
 
 VEHICLE_SPEED = {
     'plane': 800,
-    'car': 80
+    'car': 80,
+    'ship': 50
 }
 
 geolocator = Nominatim()

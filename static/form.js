@@ -16,6 +16,7 @@ $(document).ready(function() {
                     <select name="vehicle">
                         <option value="plane">飞机</option>
                         <option value="car">汽车</option>
+                        <option value="ship">轮船</option>
                     </select>
                     <button class="delete btn btn-danger">删除路线</button>
                 </div>
